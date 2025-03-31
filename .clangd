@@ -1,0 +1,6 @@
+CompileFlags:
+  Add: [
+    "-Iinclude",
+    "-I/opt/homebrew/include",
+    "-std=c++17"
+  ]
