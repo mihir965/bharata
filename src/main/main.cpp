@@ -1,3 +1,4 @@
+#include "../map/map.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
 #include <glad/glad.h>
@@ -54,6 +55,17 @@ void InitializeProgram() {
   GetOpenGLVersionInfo();
 }
 
+void VertexSpecification() {
+  std::vector<float> vertices = getVertexData();
+  std::vector<int> indices = getIndices();
+
+  for (float num : vertices) {
+    std::cout << num << std::endl;
+  }
+}
+
+void CreateGraphicsPipeline() {}
+
 void Input() {
   SDL_Event e;
 
@@ -88,6 +100,10 @@ void CleanUp() {
 
 int main() {
   InitializeProgram();
+
+  VertexSpecification();
+
+  CreateGraphicsPipeline();
 
   MainLoop();
 

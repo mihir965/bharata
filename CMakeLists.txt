@@ -26,6 +26,6 @@ add_library(glad src/glad.c)
 target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #Add your executable target with your source files
-add_executable(MyGame src/main.cpp src/Renderer.cpp src/Game.cpp)
+add_executable(MyGame src/main/main.cpp src/Renderer.cpp src/Game.cpp src/map/map.cpp)
 
 target_link_libraries(MyGame PRIVATE glad ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES}) 
