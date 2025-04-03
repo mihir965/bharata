@@ -13,6 +13,14 @@ else()
     message(FATAL_ERROR "SDL2 not found")
 endif()
 
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/map
+    ${CMAKE_SOURCE_DIR}/src/glad
+    /opt/homebrew/include
+
+)
+
 #Locate OpenGL
 find_package(OpenGL REQUIRED)
 if(OPENGL_FOUND)
@@ -22,10 +30,10 @@ else()
 endif()
 
 #Add GLAD
-add_library(glad src/glad.c)
+add_library(glad src/glad/glad.c)
 target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #Add your executable target with your source files
-add_executable(MyGame src/main/main.cpp src/Renderer.cpp src/Game.cpp src/map/map.cpp)
+add_executable(Bharata src/main/main.cpp src/map/map.cpp)
 
-target_link_libraries(MyGame PRIVATE glad ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES}) 
+target_link_libraries(Bharata PRIVATE glad ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES}) 
