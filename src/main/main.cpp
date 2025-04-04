@@ -1,8 +1,11 @@
 #include "../map/map.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
+#include <fstream>
 #include <glad/glad.h>
 #include <iostream>
+#include <sstream>
+#include <string.h>
 
 // GLOBALS
 int gScreenHeight = 480;
@@ -11,6 +14,12 @@ SDL_Window *gGraphicsApplicationWindow = nullptr;
 SDL_GLContext gOpenGLContext = nullptr;
 
 bool gQuit = false;
+unsigned int VAO;
+unsigned int VBO;
+unsigned int EBO;
+unsigned int vertexShader;
+unsigned int fragmentShader;
+unsigned int shaderProgram;
 
 void GetOpenGLVersionInfo() {
   std::cout << "Vendor" << glGetString(GL_VENDOR) << std::endl;
@@ -59,9 +68,50 @@ void VertexSpecification() {
   std::vector<float> vertices = getVertexData();
   std::vector<int> indices = getIndices();
 
-  for (float num : vertices) {
-    std::cout << num << std::endl;
-  }
+  // Graphics Code
+
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+               vertices.data(), GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int),
+               indices.data(), GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  const char *vertexShaderSource =
+      "#version 330 core\n"
+      "layout (location=0) in vec3 aPos;\n"
+      "void main()\n"
+      "{\n"
+      "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+      "}\0";
+
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  glCompileShader(vertexShader);
+
+  const char *fragShaderSource =
+      "#version 330 core\n"
+      "out vec4 FragColor;\n"
+      "void main()\n"
+      "{\n"
+      "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+      "}\0";
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragmentShader, 1, &fragShaderSource, NULL);
+  glCompileShader(fragmentShader);
+
+  shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
 }
 
 void CreateGraphicsPipeline() {}
@@ -79,7 +129,12 @@ void Input() {
 
 void PreDraw() {}
 
-void Draw() {}
+void Draw() {
+  glUseProgram(shaderProgram);
+  glBindVertexArray(VAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
+}
 
 void MainLoop() {
   while (!gQuit) {
