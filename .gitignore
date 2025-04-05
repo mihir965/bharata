@@ -1,0 +1,22 @@
+# 🔧 Build artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# 💻 IDE / OS specific
+*.DS_Store
+.vscode/
+.idea/
+
+# 💥 Compiled binaries and objects
+*.o
+*.obj
+*.so
+*.exe
+*.dll
+*.out
+
+# 🌐 CMake user config files
+CMakeUserPresets.json
