@@ -9,7 +9,7 @@
 #include <vector>
 
 #define MAP_WIDTH 10
-#define MAP_HEIGHT 10
+#define MAP_HEIGHT 2
 
 enum map_terrain_types {
   MAP_TERRAIN_GRASS,

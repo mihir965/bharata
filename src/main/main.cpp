@@ -1,11 +1,16 @@
 #include "../map/map.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <string_view>
 
 // GLOBALS
 int gScreenHeight = 480;
@@ -16,7 +21,7 @@ SDL_GLContext gOpenGLContext = nullptr;
 bool gQuit = false;
 unsigned int VAO;
 unsigned int VBO;
-unsigned int EBO;
+// unsigned int EBO;
 unsigned int vertexShader;
 unsigned int fragmentShader;
 unsigned int shaderProgram;
@@ -64,46 +69,67 @@ void InitializeProgram() {
   GetOpenGLVersionInfo();
 }
 
+std::string readVertexShader() {
+  std::ifstream inputVertex;
+  inputVertex.open("./src/shaders/vertex.vert");
+  if (!inputVertex.is_open()) {
+    std::cerr << "Therre was an error" << std::endl;
+  }
+  std::stringstream shaderStream;
+  shaderStream << inputVertex.rdbuf();
+  inputVertex.close();
+  return shaderStream.str();
+}
+
+std::string readFragmentShader() {
+  std::ifstream inputFragment;
+  inputFragment.open("./src/shaders/fragment.frag");
+  if (!inputFragment.is_open()) {
+    std::cerr << "Therre was an error" << std::endl;
+  }
+  std::stringstream shaderStream;
+  shaderStream << inputFragment.rdbuf();
+  inputFragment.close();
+  return shaderStream.str();
+}
+
 void VertexSpecification() {
   std::vector<float> vertices = getVertexData();
-  std::vector<int> indices = getIndices();
+  // std::vector<int> indices = getIndices();
 
   // Graphics Code
 
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
+  // glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
                vertices.data(), GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int),
-               indices.data(), GL_STATIC_DRAW);
+  //  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int),
+  //           indices.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  // Position attribute
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  const char *vertexShaderSource =
-      "#version 330 core\n"
-      "layout (location=0) in vec3 aPos;\n"
-      "void main()\n"
-      "{\n"
-      "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-      "}\0";
+  // Color attribute
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
+  std::string vertexShaderCode = readVertexShader();
+
+  const char *vertexShaderSource = vertexShaderCode.c_str();
 
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
   glCompileShader(vertexShader);
 
-  const char *fragShaderSource =
-      "#version 330 core\n"
-      "out vec4 FragColor;\n"
-      "void main()\n"
-      "{\n"
-      "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-      "}\0";
+  std::string fragmentShaderCode = readFragmentShader();
+  const char *fragShaderSource = fragmentShaderCode.c_str();
   fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragmentShader, 1, &fragShaderSource, NULL);
   glCompileShader(fragmentShader);
@@ -112,6 +138,13 @@ void VertexSpecification() {
   glAttachShader(shaderProgram, vertexShader);
   glAttachShader(shaderProgram, fragmentShader);
   glLinkProgram(shaderProgram);
+
+  glUseProgram(shaderProgram);
+
+  glm::mat4 projection = glm::ortho(0.0f, 640.0f, 480.0f, 0.0f, -1.0f, 1.0f);
+
+  GLint projLoc = glGetUniformLocation(shaderProgram, "uProjection");
+  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 void CreateGraphicsPipeline() {}
@@ -132,7 +165,8 @@ void PreDraw() {}
 void Draw() {
   glUseProgram(shaderProgram);
   glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glDrawArrays(GL_TRIANGLES, 0, 6 * 10 * 2);
   glBindVertexArray(0);
 }
 
@@ -154,6 +188,17 @@ void CleanUp() {
 }
 
 int main() {
+
+  //  std::vector<std::vector<int>> map = {{1, 0, 0}, {0, 0, 0}, {1, 1, 1}};
+
+  // for (int i = 0; i < map.size(); i++) {
+  //   for (int j = 0; j < map[0].size(); j++) {
+  //     std::cout << map[i][j] << std::endl;
+  //   }
+  // }
+
+  std::cout << "current working directory: "
+            << std::filesystem::current_path().string() << std::endl;
   InitializeProgram();
 
   VertexSpecification();
