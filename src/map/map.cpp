@@ -6,8 +6,12 @@
 
 map_terrain_types map[MAP_HEIGHT][MAP_WIDTH];
 
-std::vector<std::vector<int>> mapVal = {{1, 0, 2, 1, 0, 0, 0, 1, 1, 1},
-                                        {1, 0, 0, 0, 1, 0, 0, 0, 1, 1}};
+std::vector<std::vector<int>> mapVal = {
+    {0, 1, 0, 0, 1, 0, 1, 0, 0, 1}, {1, 0, 1, 0, 1, 0, 0, 1, 1, 0},
+    {0, 1, 1, 0, 0, 1, 0, 0, 1, 0}, {1, 0, 0, 1, 1, 0, 1, 0, 0, 1},
+    {0, 1, 0, 1, 0, 1, 1, 2, 0, 0}, {1, 0, 1, 0, 1, 0, 0, 1, 1, 0},
+    {0, 1, 0, 1, 1, 0, 1, 0, 0, 1}, {1, 0, 1, 0, 0, 1, 0, 1, 1, 0},
+    {0, 0, 1, 1, 0, 0, 1, 0, 1, 0}, {1, 1, 0, 0, 1, 1, 0, 1, 0, 1}};
 
 void map_reset() {
   for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -19,26 +23,35 @@ void map_reset() {
 
 std::vector<float> getVertexData() {
 
-  int tileSize = 32;
-  int gridWidth = MAP_WIDTH * tileSize;
-  int gridHeight = MAP_HEIGHT * tileSize;
+  float tileWidth = 64.0f;
+  float tileHeight = 32.0f;
+  float gridWidth = (MAP_WIDTH + MAP_HEIGHT) * (tileWidth / 2.0f);
+  float gridHeight = (MAP_WIDTH + MAP_HEIGHT) * (tileHeight / 2.0f);
 
-  float offsetX = (640 - gridWidth) / 2.0f;
-  float offsetY = (480 - gridHeight) / 2.0f;
+  float offsetX = (640 - gridWidth) / 2.0f + (MAP_WIDTH * tileWidth / 2.0f);
+  float offsetY = (480 - gridHeight) / 2.0f + (MAP_HEIGHT * tileHeight / 8.0f);
 
   std::vector<float> vertices;
 
   for (int row = 0; row < MAP_HEIGHT; row++) {
     for (int col = 0; col < MAP_WIDTH; col++) {
       // std::cout << mapVal[row][col] << std::endl;
-      float x1 = offsetX + col * tileSize;
-      float y1 = offsetY + row * tileSize;
-      float x2 = x1 + tileSize;
-      float y2 = y1;
-      float x3 = x1 + tileSize;
-      float y3 = y1 + tileSize;
-      float x4 = x1;
-      float y4 = y1 + tileSize;
+      //      float x1 = offsetX + col * tileSize + tileSize / 2.0f;
+      //      float y1 = offsetY + row * tileSize;
+      float xCenter = ((col - row) * tileWidth / 2.0f) + offsetX;
+      float yCenter = ((col + row) * tileHeight / 2.0f) + offsetY;
+
+      float x1 = xCenter;
+      float y1 = yCenter - tileHeight / 2.0f;
+
+      float x2 = xCenter + tileWidth / 2.0f;
+      float y2 = yCenter;
+
+      float x3 = xCenter;
+      float y3 = yCenter + tileHeight / 2.0f;
+
+      float x4 = xCenter - tileWidth / 2.0f;
+      float y4 = yCenter;
 
       float r, g, b;
       switch (mapVal[row][col]) {

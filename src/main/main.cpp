@@ -139,6 +139,11 @@ void VertexSpecification() {
   glAttachShader(shaderProgram, fragmentShader);
   glLinkProgram(shaderProgram);
 
+  glDetachShader(shaderProgram, vertexShader);
+  glDetachShader(shaderProgram, fragmentShader);
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+
   glUseProgram(shaderProgram);
 
   glm::mat4 projection = glm::ortho(0.0f, 640.0f, 480.0f, 0.0f, -1.0f, 1.0f);
@@ -166,7 +171,7 @@ void Draw() {
   glUseProgram(shaderProgram);
   glBindVertexArray(VAO);
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glDrawArrays(GL_TRIANGLES, 0, 6 * 10 * 2);
+  glDrawArrays(GL_TRIANGLES, 0, 6 * 10 * 10);
   glBindVertexArray(0);
 }
 
