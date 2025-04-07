@@ -4,24 +4,9 @@
 #include <stdbool.h>
 #include <vector>
 
-map_terrain_types map[MAP_HEIGHT][MAP_WIDTH];
+int map[MAP_HEIGHT][MAP_WIDTH];
 
-std::vector<std::vector<int>> mapVal = {
-    {0, 1, 0, 0, 1, 0, 1, 0, 0, 1}, {1, 0, 1, 0, 1, 0, 0, 1, 1, 0},
-    {0, 1, 1, 0, 0, 1, 0, 0, 1, 0}, {1, 0, 0, 1, 1, 0, 1, 0, 0, 1},
-    {0, 1, 0, 1, 0, 1, 1, 2, 0, 0}, {1, 0, 1, 0, 1, 0, 0, 1, 1, 0},
-    {0, 1, 0, 1, 1, 0, 1, 0, 0, 1}, {1, 0, 1, 0, 0, 1, 0, 1, 1, 0},
-    {0, 0, 1, 1, 0, 0, 1, 0, 1, 0}, {1, 1, 0, 0, 1, 1, 0, 1, 0, 1}};
-
-void map_reset() {
-  for (int y = 0; y < MAP_HEIGHT; y++) {
-    for (int x = 0; x < MAP_WIDTH; x++) {
-      map[y][x] = MAP_TERRAIN_GRASS;
-    }
-  }
-}
-
-std::vector<float> getVertexData() {
+std::vector<float> getVertexData(const std::vector<std::vector<int>> mapVal) {
 
   float tileWidth = 64.0f;
   float tileHeight = 32.0f;
@@ -35,9 +20,6 @@ std::vector<float> getVertexData() {
 
   for (int row = 0; row < MAP_HEIGHT; row++) {
     for (int col = 0; col < MAP_WIDTH; col++) {
-      // std::cout << mapVal[row][col] << std::endl;
-      //      float x1 = offsetX + col * tileSize + tileSize / 2.0f;
-      //      float y1 = offsetY + row * tileSize;
       float xCenter = ((col - row) * tileWidth / 2.0f) + offsetX;
       float yCenter = ((col + row) * tileHeight / 2.0f) + offsetY;
 
@@ -57,8 +39,8 @@ std::vector<float> getVertexData() {
       switch (mapVal[row][col]) {
       case 1:
         r = 0.0f;
-        g = 1.0f;
-        b = 0.0f;
+        g = 0.0f;
+        b = 1.0f;
         break;
       case 2:
         r = 1.0f;
@@ -67,8 +49,8 @@ std::vector<float> getVertexData() {
         break;
       case 0:
         r = 0.0f;
-        g = 0.0f;
-        b = 1.0f;
+        g = 1.0f;
+        b = 0.0f;
         break;
       }
       vertices.push_back(x1);
@@ -110,9 +92,4 @@ std::vector<float> getVertexData() {
     }
   }
   return vertices;
-}
-
-std::vector<int> getIndices() {
-  std::vector<int> indices = {0, 1, 2, 0, 2, 3};
-  return indices;
 }

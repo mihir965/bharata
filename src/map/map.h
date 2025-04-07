@@ -11,13 +11,13 @@
 #define MAP_WIDTH 10
 #define MAP_HEIGHT 10
 
-enum map_terrain_types {
-  MAP_TERRAIN_GRASS,
-  MAP_TERRAIN_WATER,
-  MAP_TERRAIN_GROUND
-};
+// enum map_terrain_types {
+//   MAP_TERRAIN_GRASS,
+//   MAP_TERRAIN_WATER,
+//   MAP_TERRAIN_GROUND
+// };
 
-std::vector<float> getVertexData();
-std::vector<int> getIndices();
-void map_reset();
+std::vector<float> getVertexData(const std::vector<std::vector<int>> mapVal);
+// std::vector<int> getIndices();
+// void map_reset();
 #endif // MAP_H_

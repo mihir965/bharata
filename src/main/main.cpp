@@ -1,3 +1,4 @@
+#include "../grid/grid.h"
 #include "../map/map.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
@@ -11,6 +12,7 @@
 #include <sstream>
 #include <string.h>
 #include <string_view>
+#include <vector>
 
 // GLOBALS
 int gScreenHeight = 480;
@@ -93,8 +95,8 @@ std::string readFragmentShader() {
   return shaderStream.str();
 }
 
-void VertexSpecification() {
-  std::vector<float> vertices = getVertexData();
+void VertexSpecification(const std::vector<std::vector<int>> &grid) {
+  std::vector<float> vertices = getVertexData(grid);
   // std::vector<int> indices = getIndices();
 
   // Graphics Code
@@ -106,10 +108,6 @@ void VertexSpecification() {
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
                vertices.data(), GL_STATIC_DRAW);
-
-  //  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int),
-  //           indices.data(), GL_STATIC_DRAW);
 
   // Position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
@@ -161,6 +159,16 @@ void Input() {
     if (e.type == SDL_QUIT) {
       std::cout << "Goodbye" << std::endl;
       gQuit = true;
+    } else if (SDL_MOUSEMOTION == e.type) {
+      int x, y;
+      SDL_GetMouseState(&x, &y);
+      // std::cout << x << ":" << y << std::endl;
+    } else if (SDL_MOUSEBUTTONDOWN) {
+      int x, y;
+      SDL_GetMouseState(&x, &y);
+      if (SDL_MOUSEBUTTONUP) {
+        std::cout << x << ":" << y << std::endl;
+      }
     }
   }
 }
@@ -193,20 +201,16 @@ void CleanUp() {
 }
 
 int main() {
-
-  //  std::vector<std::vector<int>> map = {{1, 0, 0}, {0, 0, 0}, {1, 1, 1}};
-
-  // for (int i = 0; i < map.size(); i++) {
-  //   for (int j = 0; j < map[0].size(); j++) {
-  //     std::cout << map[i][j] << std::endl;
-  //   }
-  // }
-
+  std::srand(static_cast<unsigned>(std::time(
+      nullptr))); // This is for making sure that the maps are different
   std::cout << "current working directory: "
             << std::filesystem::current_path().string() << std::endl;
+
+  std::vector<std::vector<int>> grid = grid_init(MAP_HEIGHT, MAP_WIDTH);
+
   InitializeProgram();
 
-  VertexSpecification();
+  VertexSpecification(grid);
 
   CreateGraphicsPipeline();
 
