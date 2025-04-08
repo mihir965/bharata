@@ -8,31 +8,29 @@ int map[MAP_HEIGHT][MAP_WIDTH];
 
 std::vector<float> getVertexData(const std::vector<std::vector<int>> mapVal) {
 
-  float tileWidth = 64.0f;
-  float tileHeight = 32.0f;
-  float gridWidth = (MAP_WIDTH + MAP_HEIGHT) * (tileWidth / 2.0f);
-  float gridHeight = (MAP_WIDTH + MAP_HEIGHT) * (tileHeight / 2.0f);
+  float gridWidth = (MAP_WIDTH + MAP_HEIGHT) * (TILE_WIDTH / 2.0f);
+  float gridHeight = (MAP_WIDTH + MAP_HEIGHT) * (TILE_HEIGHT / 2.0f);
 
-  float offsetX = (640 - gridWidth) / 2.0f + (MAP_WIDTH * tileWidth / 2.0f);
-  float offsetY = (480 - gridHeight) / 2.0f + (MAP_HEIGHT * tileHeight / 8.0f);
+  float offsetX = (640 - gridWidth) / 2.0f + (MAP_WIDTH * TILE_WIDTH / 2.0f);
+  float offsetY = (480 - gridHeight) / 2.0f + (MAP_HEIGHT * TILE_HEIGHT / 8.0f);
 
   std::vector<float> vertices;
 
   for (int row = 0; row < MAP_HEIGHT; row++) {
     for (int col = 0; col < MAP_WIDTH; col++) {
-      float xCenter = ((col - row) * tileWidth / 2.0f) + offsetX;
-      float yCenter = ((col + row) * tileHeight / 2.0f) + offsetY;
+      float xCenter = ((col - row) * TILE_WIDTH / 2.0f) + offsetX;
+      float yCenter = ((col + row) * TILE_HEIGHT / 2.0f) + offsetY;
 
       float x1 = xCenter;
-      float y1 = yCenter - tileHeight / 2.0f;
+      float y1 = yCenter - TILE_HEIGHT / 2.0f;
 
-      float x2 = xCenter + tileWidth / 2.0f;
+      float x2 = xCenter + TILE_WIDTH / 2.0f;
       float y2 = yCenter;
 
       float x3 = xCenter;
-      float y3 = yCenter + tileHeight / 2.0f;
+      float y3 = yCenter + TILE_HEIGHT / 2.0f;
 
-      float x4 = xCenter - tileWidth / 2.0f;
+      float x4 = xCenter - TILE_WIDTH / 2.0f;
       float y4 = yCenter;
 
       float r, g, b;

@@ -50,11 +50,26 @@ int count_open_neighbors(const std::vector<std::vector<int>> &grid, int i,
   return open_neighbors;
 }
 
-std::vector<std::vector<int>> grid_init(int mapH, int mapW) {
+std::pair<int, int> place_player(std::vector<std::vector<int>> &grid, int mapH,
+                                 int mapW) {
+  int x, y;
+  while (true) {
+    x = std::rand() % mapH - 1;
+    y = std::rand() % mapW - 1;
+    if (grid[x][y] == 0) {
+      grid[x][y] = 2;
+      break;
+    }
+  }
+  return std::make_pair(x, y);
+}
+
+std::pair<std::vector<std::vector<int>>, std::pair<int, int>>
+grid_init(int mapH, int mapW) {
   // std::cout << "This is happening" << mapH << " " << mapW << std::endl;
   std::vector<std::vector<int>> grid(mapH, std::vector<int>(mapW, 1));
-  int init_x = std::rand() % mapW;
-  int init_y = std::rand() % mapH;
+  int init_x = std::rand() % mapH;
+  int init_y = std::rand() % mapW;
   // std::cout << init_x << " " << init_y << std::endl;
   grid[init_x][init_y] = 0;
   while (true) {
@@ -96,5 +111,6 @@ std::vector<std::vector<int>> grid_init(int mapH, int mapW) {
     }
     toOpen--;
   }
-  return grid;
+  std::pair<int, int> player_pos = place_player(grid, mapH, mapW);
+  return std::make_pair(grid, player_pos);
 }

@@ -20,6 +20,8 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/glad
     ${CMAKE_SOURCE_DIR}/src/shaders
     ${CMAKE_SOURCE_DIR}/src/grid
+    ${CMAKE_SOURCE_DIR}/src/cell
+    ${CMAKE_SOURCE_DIR}/src/ai
     /opt/homebrew/include
 )
 
@@ -36,6 +38,6 @@ add_library(glad src/glad/glad.c)
 target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #Add your executable target with your source files
-add_executable(Bharata src/main/main.cpp src/map/map.cpp src/grid/grid.cpp)
+add_executable(Bharata src/main/main.cpp src/map/map.cpp src/grid/grid.cpp src/ai/ai.cpp)
 
 target_link_libraries(Bharata PRIVATE glad ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES}) 

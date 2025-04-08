@@ -11,6 +11,9 @@
 #define MAP_WIDTH 10
 #define MAP_HEIGHT 10
 
+#define TILE_WIDTH 64.0f
+#define TILE_HEIGHT 32.0f
+
 // enum map_terrain_types {
 //   MAP_TERRAIN_GRASS,
 //   MAP_TERRAIN_WATER,
