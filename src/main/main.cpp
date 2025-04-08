@@ -10,7 +10,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <new>
 #include <ostream>
+#include <queue>
 #include <sstream>
 #include <string.h>
 #include <string_view>
@@ -22,6 +24,8 @@ int gScreenHeight = 480;
 int gScreenWidth = 640;
 SDL_Window *gGraphicsApplicationWindow = nullptr;
 SDL_GLContext gOpenGLContext = nullptr;
+
+std::queue<std::pair<int, int>> movementQueue;
 
 bool gQuit = false;
 unsigned int VAO;
@@ -191,19 +195,33 @@ void Input(const std::vector<std::vector<int>> &grid,
 
 			std::vector<std::pair<int, int>> pathToFollow =
 				plan_path(grid, player_pos, std::make_pair(row, col));
-			std::cout << pathToFollow.size() << std::endl;
+			//			std::cout << pathToFollow.size() << std::endl;
 
-			std::cout << "The path to follow is " << std::endl;
+			//			std::cout << "The path to follow is " << std::endl;
+
+			//			for (auto &road : pathToFollow) {
+			//				std::cout << road.first << " " << road.second <<
+			// std::endl;
+			//			}
 
 			for (auto &road : pathToFollow) {
-				std::cout << road.first << " " << road.second << std::endl;
+				std::cout << "Pushing " << road.first << " " << road.second
+						  << std::endl;
+				movementQueue.push(road);
 			}
+
 			break;
 		}
 	}
 }
 
-void PreDraw(std::vector<std::vector<int>> &grid) {
+void PreDraw(std::vector<std::vector<int>> &grid,
+			 std::pair<int, int> &player_pos) {
+	if (!movementQueue.empty()) {
+		grid = move_player(grid, player_pos, movementQueue.front());
+		player_pos = movementQueue.front();
+		movementQueue.pop();
+	}
 	VertexSpecification(grid);
 }
 
@@ -219,11 +237,12 @@ void MainLoop(std::vector<std::vector<int>> &grid,
 	while (!gQuit) {
 		Input(grid, player_pos);
 
-		PreDraw(grid);
+		PreDraw(grid, player_pos);
 
 		Draw();
 
 		SDL_GL_SwapWindow(gGraphicsApplicationWindow);
+		SDL_Delay(100);
 	}
 }
 
@@ -238,11 +257,15 @@ int main() {
 	std::cout << "current working directory: "
 			  << std::filesystem::current_path().string() << std::endl;
 
-	std::pair<std::vector<std::vector<int>>, std::pair<int, int>> grid_obj =
-		grid_init(MAP_HEIGHT, MAP_WIDTH);
+	std::vector<std::vector<int>> grid = grid_init(MAP_HEIGHT, MAP_WIDTH);
 
-	std::vector<std::vector<int>> grid = grid_obj.first;
-	std::pair<int, int> player_pos = grid_obj.second;
+	int player_init_x = std::rand() % MAP_HEIGHT - 1;
+	int player_init_y = std::rand() % MAP_WIDTH - 1;
+	std::pair<int, int> player_pos =
+		std::make_pair(player_init_x, player_init_y);
+
+	// Place player on grid
+	grid = place_element(grid, player_init_x, player_init_y, 2);
 
 	InitializeProgram();
 
