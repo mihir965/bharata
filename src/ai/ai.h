@@ -15,6 +15,8 @@ bool isBlocked(int row, int col, const std::vector<std::vector<int>> &grid);
 
 bool is_valid(int row, int col, int mapH, int mapW);
 
+bool isUnblocked(int row, int col, const std::vector<std::vector<int>> &grid);
+
 int calculateHeuristic(int row, int col, std::pair<int, int> dest);
 
 std::vector<std::pair<int, int>>

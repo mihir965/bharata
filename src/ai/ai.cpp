@@ -16,7 +16,7 @@ struct CompareNode {
 };
 
 bool isBlocked(int row, int col, const std::vector<std::vector<int>> &grid) {
-	return grid[row][col] == 1;
+	return (grid[row][col] == 1);
 }
 
 bool is_valid(int row, int col, int mapH, int mapW) {
@@ -31,9 +31,15 @@ bool is_destination(int row, int col, std::pair<int, int> dest) {
 	return (row == dest.first && col == dest.second);
 }
 
+bool isUnblocked(int row, int col, const std::vector<std::vector<int>> &grid) {
+	return (grid[row][col] == 0);
+}
+
 std::vector<std::pair<int, int>>
-track_path(std::vector<std::vector<Cell>> cell_details, std::pair<int, int> src,
-		   std::pair<int, int> dest) {
+track_path(const std::vector<std::vector<Cell>> &cell_details,
+		   std::pair<int, int> src, std::pair<int, int> dest) {
+	std::cout << "The size of cell_details is " << cell_details.size()
+			  << std::endl;
 	std::vector<std::pair<int, int>> path;
 	int i = dest.first;
 	int j = dest.second;
@@ -50,6 +56,7 @@ track_path(std::vector<std::vector<Cell>> cell_details, std::pair<int, int> src,
 		j = temp_j;
 	}
 	path.push_back(std::make_pair(src.first, src.second));
+	std::cout << "The length of the path is " << path.size() << std::endl;
 	std::reverse(path.begin(), path.end());
 	return path;
 }
@@ -57,6 +64,16 @@ track_path(std::vector<std::vector<Cell>> cell_details, std::pair<int, int> src,
 std::vector<std::pair<int, int>>
 plan_path(const std::vector<std::vector<int>> &grid,
 		  std::pair<int, int> player_pos, std::pair<int, int> dest) {
+
+	//	for (int i = 0; i < grid.size(); i++) {
+	//		for (int j = 0; j < grid[i].size(); j++) {
+	//			std::cout << grid[i][j] << std::endl;
+	//		}
+	//	}
+
+	std::cout << "The selected grid cell is a " << grid[dest.first][dest.second]
+			  << std::endl;
+
 	std::vector<std::vector<bool>> closed_list(
 		MAP_HEIGHT, std::vector<bool>(MAP_WIDTH, false));
 
@@ -85,7 +102,7 @@ plan_path(const std::vector<std::vector<int>> &grid,
 		openList.pop();
 		int i = p.row;
 		int j = p.col;
-		closed_list[i][j] = 0;
+		closed_list[i][j] = true;
 		std::vector<std::pair<int, int>> movement = {
 			{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
@@ -99,16 +116,23 @@ plan_path(const std::vector<std::vector<int>> &grid,
 					destFound = true;
 					tracked_path = track_path(
 						cell_details, std::make_pair(new_i, new_j), dest);
+					std::cout << "The length of the tracked path is ";
+					std::cout << tracked_path.size() << std::endl;
 					break;
 				}
 				if (closed_list[new_i][new_j] == false &&
-					!isBlocked(new_i, new_j, grid)) {
-					float g_new = cell_details[new_i][new_j].g + 1.0;
+					isUnblocked(new_i, new_j, grid)) {
+					// std::cout << "This ran" << std::endl;
+					float g_new = cell_details[new_i][new_j].g + 1.0f;
 					float h_new = calculateHeuristic(new_i, new_j, dest);
+					// std::cout << "The manhattan distance to dest selected is
+					// "
+					//		  << h_new << std::endl;
 					float f_new = g_new + h_new;
 					if (cell_details[new_i][new_j].f ==
 							std::numeric_limits<float>::infinity() ||
 						cell_details[new_i][new_j].f > f_new) {
+						openList.push(Node{new_i, new_j, f_new});
 						cell_details[new_i][new_j].f = f_new;
 						cell_details[new_i][new_j].g = g_new;
 						cell_details[new_i][new_j].h = h_new;
