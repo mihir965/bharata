@@ -191,14 +191,13 @@ void Input(const std::vector<std::vector<int>> &grid,
 
 			std::vector<std::pair<int, int>> pathToFollow =
 				plan_path(grid, player_pos, std::make_pair(row, col));
-			//			std::cout << pathToFollow.size() << std::endl;
+			std::cout << pathToFollow.size() << std::endl;
 
-			//			std::cout << "The path to follow is " << std::endl;
+			std::cout << "The path to follow is " << std::endl;
 
-			//			for (auto &road : pathToFollow) {
-			//				std::cout << road.first << " " << road.second <<
-			//std::endl;
-			//			}
+			for (auto &road : pathToFollow) {
+				std::cout << road.first << " " << road.second << std::endl;
+			}
 			break;
 		}
 	}

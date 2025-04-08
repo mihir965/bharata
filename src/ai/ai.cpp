@@ -56,7 +56,6 @@ track_path(const std::vector<std::vector<Cell>> &cell_details,
 		j = temp_j;
 	}
 	path.push_back(std::make_pair(src.first, src.second));
-	std::cout << "The length of the path is " << path.size() << std::endl;
 	std::reverse(path.begin(), path.end());
 	return path;
 }
@@ -114,10 +113,7 @@ plan_path(const std::vector<std::vector<int>> &grid,
 					cell_details[new_i][new_j].parent_i = i;
 					cell_details[new_i][new_j].parent_j = j;
 					destFound = true;
-					tracked_path = track_path(
-						cell_details, std::make_pair(new_i, new_j), dest);
-					std::cout << "The length of the tracked path is ";
-					std::cout << tracked_path.size() << std::endl;
+					tracked_path = track_path(cell_details, player_pos, dest);
 					break;
 				}
 				if (closed_list[new_i][new_j] == false &&
