@@ -22,6 +22,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/grid
     ${CMAKE_SOURCE_DIR}/src/cell
     ${CMAKE_SOURCE_DIR}/src/ai
+    ${CMAKE_SOURCE_DIR}/include/stb
     /opt/homebrew/include
 )
 
