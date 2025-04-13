@@ -118,7 +118,7 @@ void VertexSpecification(const std::vector<std::vector<int>> &grid) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
-	unsigned char *data = stbi_load("./src/assets/CG_Assets.png", &width,
+	unsigned char *data = stbi_load("./src/assets/grassland_tiles.png", &width,
 									&height, &nrChannels, 0);
 
 	if (data) {

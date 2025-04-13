@@ -19,8 +19,8 @@ std::vector<float> getVertexData(const std::vector<std::vector<int>> &mapVal) {
 	float offsetY =
 		(480 - gridHeight) / 2.0f + (MAP_HEIGHT * TILE_HEIGHT / 8.0f);
 
-	const float tex_tile_width = 64.0f / 192.0f;
-	const float tex_tile_height = 32.0f / 32.0f;
+	const float tex_tile_width = 64.0f / 1024.0f;
+	const float tex_tile_height = 32.0f / 1344.0f;
 
 	for (int row = 0; row < MAP_HEIGHT; row++) {
 		for (int col = 0; col < MAP_WIDTH; col++) {
@@ -40,22 +40,27 @@ std::vector<float> getVertexData(const std::vector<std::vector<int>> &mapVal) {
 			float yLeft = yCenter;
 
 			float u_min, u_max;
-			float v_min = 0.0f;
-			float v_max = 1.0f;
+			float v_min, v_max;
 
 			switch (mapVal[row][col]) {
 			case 0:
 				u_min = 0.0f;
 				u_max = tex_tile_width;
+				v_min = 0.0f;
+				v_max = tex_tile_height;
 				break;
 			case 1:
-				u_min = tex_tile_width;
-				u_max = 2 * tex_tile_width;
+				u_min = 0.0f;
+				u_max = tex_tile_width;
+				v_min = 19 * tex_tile_height;
+				v_max = 20 * tex_tile_height;
 				break;
 			case 2:
 			default:
-				u_min = 2 * tex_tile_width;
-				u_max = 1.0f;
+				u_min = 0.0f;
+				u_max = tex_tile_width;
+				v_min = tex_tile_height;
+				v_max = 2 * tex_tile_height;
 				break;
 			}
 			float u_mid = (u_min + u_max) / 2.0f;
