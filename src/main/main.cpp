@@ -111,18 +111,18 @@ void VertexSpecification(const std::vector<std::vector<int>> &grid) {
 	glGenTextures(1, &texture);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 					GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
-	unsigned char *data = stbi_load("./src/assets/grassland_tiles.png", &width,
+	unsigned char *data = stbi_load("./src/assets/CG_Assets.png", &width,
 									&height, &nrChannels, 0);
 
 	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 					 GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	} else {
@@ -136,25 +136,20 @@ void VertexSpecification(const std::vector<std::vector<int>> &grid) {
 	// Graphics Code
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	// glGenBuffers(1, &EBO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
 				 vertices.data(), GL_STATIC_DRAW);
 
 	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
 						  (void *)0);
 	glEnableVertexAttribArray(0);
 
-	// Color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+	// Texture coordinate attribute
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
 						  (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-						  (void *)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 	std::string vertexShaderCode = readVertexShader();
 
@@ -259,7 +254,7 @@ void Draw() {
 	glUseProgram(shaderProgram);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 8 * MAP_HEIGHT * MAP_WIDTH);
+	glDrawArrays(GL_TRIANGLES, 0, 6 * MAP_HEIGHT * MAP_WIDTH);
 	glBindVertexArray(0);
 }
 

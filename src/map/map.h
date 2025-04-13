@@ -14,13 +14,5 @@
 #define TILE_WIDTH 64.0f
 #define TILE_HEIGHT 32.0f
 
-// enum map_terrain_types {
-//   MAP_TERRAIN_GRASS,
-//   MAP_TERRAIN_WATER,
-//   MAP_TERRAIN_GROUND
-// };
-
-std::vector<float> getVertexData(const std::vector<std::vector<int>> mapVal);
-// std::vector<int> getIndices();
-// void map_reset();
+std::vector<float> getVertexData(const std::vector<std::vector<int>> &mapVal);
 #endif // MAP_H_
