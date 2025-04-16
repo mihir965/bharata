@@ -2,6 +2,7 @@
 #include "../grid/grid.h"
 #include "../map/map.h"
 #include "../texture/texture.h"
+#include "SDL2/SDL_image.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
 #include <filesystem>
@@ -15,7 +16,6 @@
 #include <ostream>
 #include <queue>
 #include <sstream>
-#include <stb/stb_image.h>
 #include <string.h>
 #include <string_view>
 #include <utility>
@@ -30,8 +30,8 @@ SDL_GLContext gOpenGLContext = nullptr;
 std::queue<std::pair<int, int>> movementQueue;
 
 bool gQuit = false;
-unsigned int VAO;
-unsigned int VBO;
+unsigned int gridVAO;
+unsigned int gridVBO;
 // unsigned int EBO;
 unsigned int vertexShader;
 unsigned int fragmentShader;
@@ -116,22 +116,8 @@ void VertexSpecification(const std::vector<std::vector<int>> &grid) {
 	std::vector<float> vertices = getVertexData(grid);
 
 	// Graphics Code
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-				 vertices.data(), GL_STATIC_DRAW);
-
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-						  (void *)0);
-	glEnableVertexAttribArray(0);
-
-	// Texture coordinate attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-						  (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	// setting up the grid buffers
+	gridGraphicsSetup(gridVAO, gridVBO, vertices);
 
 	std::string vertexShaderCode = readVertexShader();
 
@@ -228,7 +214,7 @@ void PreDraw(std::vector<std::vector<int>> &grid,
 void Draw() {
 	glUseProgram(shaderProgram);
 	glBindTexture(GL_TEXTURE_2D, texture01);
-	glBindVertexArray(VAO);
+	glBindVertexArray(gridVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6 * MAP_HEIGHT * MAP_WIDTH);
 	glBindVertexArray(0);
 }

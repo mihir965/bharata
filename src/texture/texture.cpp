@@ -12,15 +12,9 @@ void generateAndBindTexture(unsigned int &texture) {
 }
 
 void useSourceImageForTexture(const char *path) {
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
-
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-					 GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	} else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
+	SDL_Surface *spritesheet = IMG_Load(path);
+	GLenum fmt = (spritesheet->format->BytesPerPixel == 4) ? GL_RGBA : GL_RGB;
+	glTexImage2D(GL_TEXTURE_2D, 0, fmt, spritesheet->w, spritesheet->h, 0, fmt,
+				 GL_UNSIGNED_BYTE, spritesheet->pixels);
+	glGenerateMipmap(GL_TEXTURE_2D);
 }

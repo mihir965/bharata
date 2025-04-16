@@ -1,9 +1,9 @@
 #ifndef _TEX_
 #define _TEX_
 
+#include <SDL2/SDL_image.h>
 #include <glad/glad.h>
 #include <iostream>
-#include <stb/stb_image.h>
 
 void generateAndBindTexture(unsigned int &texture);
 

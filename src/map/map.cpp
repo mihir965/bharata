@@ -2,6 +2,7 @@
 #include <SDL2/SDL_stdinc.h>
 #include <iostream>
 #include <stdbool.h>
+#include <utility>
 #include <vector>
 
 // Grass tile is 0.0f - 0.0625f - x
@@ -56,11 +57,12 @@ std::vector<float> getVertexData(const std::vector<std::vector<int>> &mapVal) {
 				v_max = 20 * tex_tile_height;
 				break;
 			case 2:
-			default:
 				u_min = 0.0f;
 				u_max = tex_tile_width;
-				v_min = tex_tile_height;
-				v_max = 2 * tex_tile_height;
+				v_min = 0.0f;
+				v_max = tex_tile_height;
+				break;
+			default:
 				break;
 			}
 			float u_mid = (u_min + u_max) / 2.0f;
@@ -116,4 +118,24 @@ std::vector<float> getVertexData(const std::vector<std::vector<int>> &mapVal) {
 		}
 	}
 	return vertices;
+}
+
+void gridGraphicsSetup(unsigned int &VAO, unsigned int &VBO,
+					   std::vector<float> vertices) {
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+				 vertices.data(), GL_STATIC_DRAW);
+
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+						  (void *)0);
+	glEnableVertexAttribArray(0);
+
+	// Texture coordinate attribute
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+						  (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
