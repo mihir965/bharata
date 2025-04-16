@@ -1,6 +1,7 @@
 #include "../ai/ai.h"
 #include "../grid/grid.h"
 #include "../map/map.h"
+#include "../texture/texture.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
 #include <filesystem>
@@ -35,7 +36,7 @@ unsigned int VBO;
 unsigned int vertexShader;
 unsigned int fragmentShader;
 unsigned int shaderProgram;
-unsigned int texture;
+unsigned int texture01;
 
 void GetOpenGLVersionInfo() {
 	std::cout << "Vendor" << glGetString(GL_VENDOR) << std::endl;
@@ -108,29 +109,10 @@ std::string readFragmentShader() {
 void VertexSpecification(const std::vector<std::vector<int>> &grid) {
 
 	// Loading the spritesheet
-	glGenTextures(1, &texture);
+	generateAndBindTexture(texture01);
 
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-					GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	useSourceImageForTexture("./src/assets/grassland_tiles.png");
 
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load("./src/assets/grassland_tiles.png", &width,
-									&height, &nrChannels, 0);
-
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-					 GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	} else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	// Loading the vertices
 	std::vector<float> vertices = getVertexData(grid);
 
 	// Graphics Code
@@ -177,7 +159,8 @@ void VertexSpecification(const std::vector<std::vector<int>> &grid) {
 
 	glUseProgram(shaderProgram);
 
-	glm::mat4 projection = glm::ortho(0.0f, 640.0f, 480.0f, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, float(gScreenWidth),
+									  float(gScreenHeight), 0.0f, -1.0f, 1.0f);
 
 	GLint projLoc = glGetUniformLocation(shaderProgram, "uProjection");
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -202,10 +185,10 @@ void Input(const std::vector<std::vector<int>> &grid,
 			SDL_GetMouseState(&x, &y);
 			float gridWidth = (MAP_WIDTH + MAP_HEIGHT) * (TILE_WIDTH / 2.0f);
 			float gridHeight = (MAP_WIDTH + MAP_HEIGHT) * (TILE_HEIGHT / 2.0f);
-			float offsetX =
-				(640 - gridWidth) / 2.0f + (MAP_WIDTH * TILE_WIDTH / 2.0f);
-			float offsetY =
-				(480 - gridHeight) / 2.0f + (MAP_HEIGHT * TILE_HEIGHT / 8.0f);
+			float offsetX = (float(gScreenWidth) - gridWidth) / 2.0f +
+							(MAP_WIDTH * TILE_WIDTH / 2.0f);
+			float offsetY = (float(gScreenHeight) - gridHeight) / 2.0f +
+							(MAP_HEIGHT * TILE_HEIGHT / 8.0f);
 			float xRel = x - offsetX;
 			float yRel = y - offsetY;
 
@@ -221,14 +204,6 @@ void Input(const std::vector<std::vector<int>> &grid,
 
 			std::vector<std::pair<int, int>> pathToFollow =
 				plan_path(grid, player_pos, std::make_pair(row, col));
-			//			std::cout << pathToFollow.size() << std::endl;
-
-			//			std::cout << "The path to follow is " << std::endl;
-
-			//			for (auto &road : pathToFollow) {
-			//				std::cout << road.first << " " << road.second <<
-			// std::endl;
-			//			}
 
 			for (auto &road : pathToFollow) {
 				std::cout << "Pushing " << road.first << " " << road.second
@@ -252,7 +227,7 @@ void PreDraw(std::vector<std::vector<int>> &grid,
 
 void Draw() {
 	glUseProgram(shaderProgram);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, texture01);
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6 * MAP_HEIGHT * MAP_WIDTH);
 	glBindVertexArray(0);
