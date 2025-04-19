@@ -10,6 +10,7 @@
 #include <string>
 #include <unit/unit.h>
 #include <unordered_map>
+#include <vector>
 
 using namespace std;
 
@@ -18,7 +19,8 @@ class Game {
 	Game();
 	~Game();
 
-	bool init(int mapH, int mapW);
+	bool init(int mapH, int mapW,
+			  int num); // Third value is the number of units to create
 	void createGrid();
 	void runLoop();
 	void handleEvents();
@@ -29,14 +31,19 @@ class Game {
 	void loadTexture(const std::string &name, const char *path);
 	Texture *getTexture(const std::string &name);
 
+	void loadShader(const std::string &name, const char *path);
+	std::string *getShader(const std::string &name);
+
   private:
 	SDL_Window *window;
 	SDL_GLContext context;
 	bool isRunning;
 
 	std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap;
+	std::unordered_map<std::string, std::unique_ptr<std::string>> ShaderMap;
 	std::unique_ptr<Grid> grid;
 	std::vector<Unit> unit;
+	std::vector<vector<unsigned int>> occupancyGrid;
 };
 
 #endif

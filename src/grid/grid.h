@@ -33,10 +33,11 @@ class Grid {
 
 	void assignTexture(Texture *srcTex);
 
-	void getVertexData(const std::vector<std::vector<int>> &map);
+	void getVertexData();
 
-	void gridGraphicsSetup(unsigned int &VAO, unsigned int &VBO,
-						   std::vector<float> vertexData);
+	void gridGraphicsSetup();
+
+	void compileShaders(std::string *vSrc, std::string *fSrc);
 
 	std::string readVertexShader();
 

@@ -12,6 +12,8 @@ class Unit {
   private:
 	int row, col;
 	Texture *texture;
+	unsigned int unitId;
+	static unsigned int nextID;
 };
 
 #endif

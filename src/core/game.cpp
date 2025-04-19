@@ -1,13 +1,15 @@
 #include "game.h"
 #include "grid/grid.h"
 #include "texture/texture.h"
+#include <fstream>
 #include <memory>
+#include <vector>
 
 Game::Game() : isRunning(false) {}
 
 Game::~Game() {}
 
-bool Game::init(int mapH, int mapW) {
+bool Game::init(int mapH, int mapW, int num) {
 	cout << "Welcome to Bharata" << endl;
 
 	// Set status of the game to true
@@ -47,9 +49,29 @@ bool Game::init(int mapH, int mapW) {
 	grid = std::make_unique<Grid>(mapH, mapW);
 	grid->generate();
 	cout << "Grid generation over" << endl;
+
+	// Loading textures
 	loadTexture("gridSprite", "./src/assets/grassland_tiles.png");
 	grid->assignTexture(this->getTexture("gridSprite"));
 	cout << "Returning game init" << endl;
+
+	// Initialize the vertices of the grid and compile shaders for the grid
+	grid->getVertexData();
+	grid->gridGraphicsSetup();
+
+	loadShader("gridVertex", "./src/shaders/vShader.vert");
+	loadShader("gridFragment", "./src/shaders/fShader.frag");
+	grid->compileShaders(getShader("gridVertex"), getShader("gridFragment"));
+
+	// Create units on the grid
+	occupancyGrid =
+		std::vector<vector<unsigned int>>(mapH, vector<unsigned int>(mapW, 0));
+
+	for (int i = 0; i < mapH; i++) {
+		for (int j = 0; j < mapW; j++) {
+			occupancyGrid[i][j] = grid->getValue(i, j);
+		}
+	}
 	return true;
 }
 
@@ -96,4 +118,26 @@ Texture *Game::getTexture(const std::string &name) {
 		return nullptr;
 	}
 	return textureMap.find(name)->second.get();
+}
+
+void Game::loadShader(const std::string &name, const char *path) {
+	if (ShaderMap.find(name) == ShaderMap.end()) {
+		cout << "The shader has not been loaded" << std::endl;
+		std::ifstream inputVertex;
+		inputVertex.open(path);
+		if (!inputVertex.is_open()) {
+			std::cerr << "There was an error" << std::endl;
+		}
+		std::stringstream shaderStream;
+		shaderStream << inputVertex.rdbuf();
+		inputVertex.close();
+		ShaderMap[name] = std::make_unique<std::string>(shaderStream.str());
+	}
+}
+
+std::string *Game::getShader(const std::string &name) {
+	if (ShaderMap.find(name) == ShaderMap.end()) {
+		return nullptr;
+	}
+	return ShaderMap.find(name)->second.get();
 }
