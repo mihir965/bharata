@@ -2,10 +2,14 @@
 #define _COREGAME_
 
 #include "../grid/grid.h"
+#include "texture/texture.h"
 #include <SDL2/SDL.h>
+#include <glad/glad.h>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <unit/unit.h>
+#include <unordered_map>
 
 using namespace std;
 
@@ -14,7 +18,7 @@ class Game {
 	Game();
 	~Game();
 
-	bool init();
+	bool init(int mapH, int mapW);
 	void createGrid();
 	void runLoop();
 	void handleEvents();
@@ -22,11 +26,15 @@ class Game {
 	void render();
 	void clean();
 
+	void loadTexture(const std::string &name, const char *path);
+	Texture *getTexture(const std::string &name);
+
   private:
 	SDL_Window *window;
 	SDL_GLContext context;
 	bool isRunning;
 
+	std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap;
 	std::unique_ptr<Grid> grid;
 	std::vector<Unit> unit;
 };

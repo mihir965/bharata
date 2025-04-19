@@ -1,12 +1,13 @@
 #include "game.h"
 #include "grid/grid.h"
+#include "texture/texture.h"
 #include <memory>
 
 Game::Game() : isRunning(false) {}
 
 Game::~Game() {}
 
-bool Game::init() {
+bool Game::init(int mapH, int mapW) {
 	cout << "Welcome to Bharata" << endl;
 
 	// Set status of the game to true
@@ -38,6 +39,17 @@ bool Game::init() {
 		exit(1);
 	}
 
+	gladLoadGLLoader(SDL_GL_GetProcAddress);
+
+	// The init function will also create the grid
+	//
+	// This is also assigning the sprite for the grid
+	grid = std::make_unique<Grid>(mapH, mapW);
+	grid->generate();
+	cout << "Grid generation over" << endl;
+	loadTexture("gridSprite", "./src/assets/grassland_tiles.png");
+	grid->assignTexture(this->getTexture("gridSprite"));
+	cout << "Returning game init" << endl;
 	return true;
 }
 
@@ -58,8 +70,30 @@ void Game::clean() {
 	SDL_Quit();
 }
 
+void Game::render() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	grid->draw();
+	SDL_GL_SwapWindow(window);
+}
+
 void Game::runLoop() {
 	while (isRunning) {
 		handleEvents();
+		render();
 	}
+}
+
+void Game::loadTexture(const std::string &name, const char *path) {
+	if (textureMap.find(name) == textureMap.end()) {
+		cout << "The texture was not found" << endl;
+		textureMap[name] = std::make_unique<Texture>(path);
+		cout << "Texture loaded" << endl;
+	}
+}
+
+Texture *Game::getTexture(const std::string &name) {
+	if (textureMap.find(name) == textureMap.end()) {
+		return nullptr;
+	}
+	return textureMap.find(name)->second.get();
 }

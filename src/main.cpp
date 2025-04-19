@@ -8,17 +8,11 @@
 int main() {
 	Game game;
 
-	bool gameInitialized = game.init();
+	bool gameInitialized =
+		game.init(40, 40); // The arguements are the dimensions for the grid
 
 	if (gameInitialized) {
 		std::cout << "The game has been initialized" << std::endl;
-
-		Grid grid;
-
-		vector<vector<int>> myGrid = grid.generate(40, 40);
-
-		std::cout << myGrid.size() << std::endl;
-
 		game.runLoop();
 	}
 
