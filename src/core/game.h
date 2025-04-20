@@ -42,7 +42,7 @@ class Game {
 	std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap;
 	std::unordered_map<std::string, std::unique_ptr<std::string>> ShaderMap;
 	std::unique_ptr<Grid> grid;
-	std::vector<Unit> unit;
+	std::vector<std::unique_ptr<Unit>> units;
 	std::vector<vector<unsigned int>> occupancyGrid;
 };
 

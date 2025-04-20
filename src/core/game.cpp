@@ -64,12 +64,29 @@ bool Game::init(int mapH, int mapW, int num) {
 	grid->compileShaders(getShader("gridVertex"), getShader("gridFragment"));
 
 	// Create units on the grid
+	// We need to update the occupancy grid with the way the actual grid is
+	// initialized
 	occupancyGrid =
 		std::vector<vector<unsigned int>>(mapH, vector<unsigned int>(mapW, 0));
 
 	for (int i = 0; i < mapH; i++) {
 		for (int j = 0; j < mapW; j++) {
 			occupancyGrid[i][j] = grid->getValue(i, j);
+		}
+	}
+
+	// Loading unit textures
+	loadTexture("knightSprite", "./src/assets/knight.png");
+	loadShader("unitVertex", "./src/shaders/unitVShader.vert");
+	loadShader("unitFragment", "./src/shaders/unitFShader.frag");
+	Unit::compileShaders(getShader("unitVertex"), getShader("unitFragment"));
+	Unit::initGraphics();
+	for (int i = 0; i < mapH; i++) {
+		for (int j = 0; j < mapW; j++) {
+			if (occupancyGrid[i][j] == 0) {
+				units.emplace_back(
+					std::make_unique<Unit>(i, j, getTexture("knightSprite")));
+			}
 		}
 	}
 	return true;
@@ -93,8 +110,11 @@ void Game::clean() {
 }
 
 void Game::render() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	grid->draw();
+	for (auto &unit : this->units) {
+		unit->drawSprite();
+	}
 	SDL_GL_SwapWindow(window);
 }
 
@@ -122,7 +142,6 @@ Texture *Game::getTexture(const std::string &name) {
 
 void Game::loadShader(const std::string &name, const char *path) {
 	if (ShaderMap.find(name) == ShaderMap.end()) {
-		cout << "The shader has not been loaded" << std::endl;
 		std::ifstream inputVertex;
 		inputVertex.open(path);
 		if (!inputVertex.is_open()) {
