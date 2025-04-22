@@ -9,14 +9,14 @@ unsigned int Unit::vertexShader = 0;
 unsigned int Unit::fragmentShader = 0;
 unsigned int Unit::shaderProgram = 0;
 std::vector<float> Unit::vertices = {
-	// pos      // tex
-	0.0f, 1.0f, 0.0f, 0.0f, // top-left
-	1.0f, 1.0f, 1.0f, 0.0f, // top-right
-	1.0f, 0.0f, 1.0f, 1.0f, // bottom-right
+	// pos      // tex (u, v)
+	0.0f, 1.0f, 0.0f,	1.0f, // top-left
+	1.0f, 1.0f, 0.047f, 1.0f, // top-right
+	1.0f, 0.0f, 0.047f, 0.0f, // bottom-right
 
-	0.0f, 1.0f, 0.0f, 0.0f, // top-left
-	1.0f, 0.0f, 1.0f, 1.0f, // bottom-right
-	0.0f, 0.0f, 0.0f, 1.0f	// bottom-left
+	0.0f, 1.0f, 0.0f,	1.0f, // top-left
+	1.0f, 0.0f, 0.047f, 0.0f, // bottom-right
+	0.0f, 0.0f, 0.0f,	0.0f  // bottom-left
 };
 
 Unit::Unit(int row, int col, Texture *sprite) {
@@ -77,25 +77,29 @@ void Unit::compileShaders(std::string *vSrc, std::string *fSrc) {
 
 void Unit::drawSprite() {
 	glUseProgram(Unit::shaderProgram);
-	float gridWidth = (40 + 40) * (this->texture->width / 2.0f);
-	float gridHeight = (40 + 40) * (this->texture->height / 2.0f);
+	float gridWidth = (16 + 16) * (64.0f / 2.0f);
+	float gridHeight = (16 + 16) * (32.0f / 2.0f);
 
-	float offsetX =
-		(1024 - gridWidth) / 2.0f + (40 * this->texture->width / 2.0f);
-	float offsetY =
-		(786 - gridHeight) / 2.0f + (40 * this->texture->height / 112.0f);
-	int isoX = (col - row) * (texture->width / 2) + offsetX;
-	int isoY = (col + row) * (texture->height / 2) + offsetY;
+	float offsetX = (1024 - gridWidth) / 2.0f;
+	float offsetY = (786 - gridHeight) / 2.0f;
+	int isoX = (col - row) * (64.0f / 2) + offsetX;
+	int isoY = (col + row) * (32.0f / 2) + offsetY;
+
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(isoX, isoY, 0.0f));
-	model = glm::scale(model, glm::vec3(texture->width, texture->height, 1.0f));
+	model = glm::scale(model, glm::vec3(128.0f * 2.0f, 64.0f * 2.0f, 1.0f));
+
 	GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
-	glm::mat4 projection = glm::ortho(0.0f, 1024.0f, 768.0f, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, 1024.0f, 786.0f, 0.0f, -1.0f, 1.0f);
+
 	GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
 	GLint texLoc = glGetUniformLocation(shaderProgram, "image");
-	glUniform1i(texLoc, 0); // Texture unit 0
+
+	glUniform1i(texLoc, 0);
+
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture->getID());
 	glBindVertexArray(Unit::VAO);

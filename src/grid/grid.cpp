@@ -122,10 +122,8 @@ void Grid::getVertexData() {
 	float gridHeight =
 		(this->mapWidth + this->mapHeight) * (this->tileHeight / 2.0f);
 
-	float offsetX =
-		(1024 - gridWidth) / 2.0f + (this->mapWidth * this->tileWidth / 2.0f);
-	float offsetY = (786 - gridHeight) / 2.0f +
-					(this->mapHeight * this->tileHeight / 112.0f);
+	float offsetX = (1024 / 2.0f) - ((mapWidth / 2.0f) * tileWidth / 2.0f);
+	float offsetY = (786 / 2.0f) - ((mapHeight / 2.0f) * tileHeight / 2.0f);
 
 	const float tex_tile_width = this->tileWidth / this->sprite->width;
 	const float tex_tile_height = this->tileHeight / this->sprite->height;
@@ -134,8 +132,8 @@ void Grid::getVertexData() {
 
 	for (int row = 0; row < this->mapHeight; row++) {
 		for (int col = 0; col < this->mapWidth; col++) {
-			float xCenter = ((col - row) * this->tileWidth / 2.0f) + offsetX;
-			float yCenter = ((col + row) * this->tileHeight / 2.0f) + offsetY;
+			float xCenter = ((col - row) * tileWidth / 2.0f) + offsetX;
+			float yCenter = ((col + row) * tileHeight / 2.0f) + offsetY;
 
 			float xTop = xCenter;
 			float yTop = yCenter - this->tileHeight / 2.0f;
@@ -287,7 +285,7 @@ void Grid::draw() {
 
 	glUseProgram(shaderProgram);
 	glm::mat4 projection =
-		glm::ortho(0.0f, float(1024), float(768), 0.0f, -1.0f, 1.0f);
+		glm::ortho(0.0f, float(1024), float(786), 0.0f, -1.0f, 1.0f);
 
 	GLint projLoc = glGetUniformLocation(shaderProgram, "uProjection");
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));

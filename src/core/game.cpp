@@ -1,8 +1,13 @@
 #include "game.h"
 #include "grid/grid.h"
 #include "texture/texture.h"
+#include <algorithm>
 #include <fstream>
+#include <iterator>
 #include <memory>
+#include <random>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 Game::Game() : isRunning(false) {}
@@ -46,6 +51,9 @@ bool Game::init(int mapH, int mapW, int num) {
 	// The init function will also create the grid
 	//
 	// This is also assigning the sprite for the grid
+	//
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	grid = std::make_unique<Grid>(mapH, mapW);
 	grid->generate();
 	cout << "Grid generation over" << endl;
@@ -81,11 +89,31 @@ bool Game::init(int mapH, int mapW, int num) {
 	loadShader("unitFragment", "./src/shaders/unitFShader.frag");
 	Unit::compileShaders(getShader("unitVertex"), getShader("unitFragment"));
 	Unit::initGraphics();
+
+	//	vector<pair<int, int>> openCells;
+	//	for (int i = 0; i < mapH; i++) {
+	//		for (int j = 0; j < mapW; j++) {
+	//			if (occupancyGrid[i][j] == 0) {
+	//				openCells.push_back(make_pair(i, j));
+	//			}
+	//		}
+	//	}
+	//	vector<pair<int, int>> random_cells;
+	//	std::random_device rd;
+	//	std::mt19937 gen(rd());
+	//	std::sample(openCells.begin(), openCells.end(),
+	//				std::back_inserter(random_cells), num, gen);
+	//
+	//	for (const auto &cell : random_cells) {
+	//		units.emplace_back(make_unique<Unit>(cell.first, cell.second,
+	//											 getTexture("knightSprite")));
+	//	}
+
 	for (int i = 0; i < mapH; i++) {
 		for (int j = 0; j < mapW; j++) {
 			if (occupancyGrid[i][j] == 0) {
 				units.emplace_back(
-					std::make_unique<Unit>(i, j, getTexture("knightSprite")));
+					make_unique<Unit>(i, j, getTexture("knightSprite")));
 			}
 		}
 	}
