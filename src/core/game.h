@@ -34,6 +34,8 @@ class Game {
 	void loadShader(const std::string &name, const char *path);
 	std::string *getShader(const std::string &name);
 
+	void getUnits(int i_x, int i_y, int f_x, int f_y);
+
   private:
 	SDL_Window *window;
 	SDL_GLContext context;
@@ -44,6 +46,10 @@ class Game {
 	std::unique_ptr<Grid> grid;
 	std::vector<std::unique_ptr<Unit>> units;
 	std::vector<vector<unsigned int>> occupancyGrid;
+	bool isSelecting;
+	int init_x, init_y;
+	int final_x, final_y;
+	std::vector<unsigned int> selectedUnits;
 };
 
 #endif

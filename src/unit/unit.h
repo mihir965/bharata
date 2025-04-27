@@ -17,6 +17,9 @@ class Unit {
 	void drawSprite();
 	static void compileShaders(std::string *vSrc, std::string *fSrc);
 	void cleanUpGraphics();
+	int getRow();
+	int getCol();
+	unsigned int getID();
 
   private:
 	int row, col;

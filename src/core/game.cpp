@@ -2,6 +2,7 @@
 #include "grid/grid.h"
 #include "texture/texture.h"
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iterator>
 #include <memory>
@@ -90,44 +91,91 @@ bool Game::init(int mapH, int mapW, int num) {
 	Unit::compileShaders(getShader("unitVertex"), getShader("unitFragment"));
 	Unit::initGraphics();
 
-	//	vector<pair<int, int>> openCells;
-	//	for (int i = 0; i < mapH; i++) {
-	//		for (int j = 0; j < mapW; j++) {
-	//			if (occupancyGrid[i][j] == 0) {
-	//				openCells.push_back(make_pair(i, j));
-	//			}
-	//		}
-	//	}
-	//	vector<pair<int, int>> random_cells;
-	//	std::random_device rd;
-	//	std::mt19937 gen(rd());
-	//	std::sample(openCells.begin(), openCells.end(),
-	//				std::back_inserter(random_cells), num, gen);
-	//
-	//	for (const auto &cell : random_cells) {
-	//		units.emplace_back(make_unique<Unit>(cell.first, cell.second,
-	//											 getTexture("knightSprite")));
-	//	}
-
+	vector<pair<int, int>> openCells;
 	for (int i = 0; i < mapH; i++) {
 		for (int j = 0; j < mapW; j++) {
 			if (occupancyGrid[i][j] == 0) {
-				units.emplace_back(
-					make_unique<Unit>(i, j, getTexture("knightSprite")));
+				openCells.push_back(make_pair(i, j));
 			}
 		}
 	}
+	vector<pair<int, int>> random_cells;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::sample(openCells.begin(), openCells.end(),
+				std::back_inserter(random_cells), num, gen);
+
+	for (const auto &cell : random_cells) {
+		units.emplace_back(make_unique<Unit>(cell.first, cell.second,
+											 getTexture("knightSprite")));
+	}
+
+	// for (int i = 0; i < mapH; i++) {
+	//	for (int j = 0; j < mapW; j++) {
+	//		if (occupancyGrid[i][j] == 0) {
+	//			units.emplace_back(
+	//				make_unique<Unit>(i, j, getTexture("knightSprite")));
+	//		}
+	//	}
+	// }
+
+	// units.emplace_back(make_unique<Unit>(0, 0, getTexture("knightSprite")));
 	return true;
+}
+
+void Game::getUnits(int i_x, int i_y, int f_x, int f_y) {
+	for (int i = i_x; i <= f_x; i++) {
+		for (int j = i_y; j <= f_y; j++) {
+			for (auto &unit : this->units) {
+				if (unit->getRow() == i && unit->getCol() == j) {
+					this->selectedUnits.emplace_back(unit->getID());
+				}
+			}
+		}
+	}
 }
 
 void Game::handleEvents() {
 	SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT:
+		if (event.type == SDL_QUIT) {
 			isRunning = false;
 			break;
+		} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				isSelecting = true;
+				init_x = event.button.x;
+				init_y = event.button.y;
+			}
+		} else if (event.type == SDL_MOUSEBUTTONUP) {
+			if (event.button.button == SDL_BUTTON_LEFT && isSelecting) {
+				final_x = event.button.x;
+				final_y = event.button.y;
+				isSelecting = false;
+				// cout << init_x << " " << init_y << endl;
+				// cout << final_x << " " << final_y << endl;
+				float init_dx = float(init_x) - 1024 / 2.0f;
+				float init_dy = float(init_y) + 786 / 7.0f;
+
+				float final_dx = float(final_x) - 1024 / 2.0f;
+				float final_dy = float(init_y) + 786 / 7.0f;
+
+				float init_colF = (init_dx / 32.0f + init_dy / 16.0f) * 0.5f;
+				float init_rowF = (init_dy / 16.0f - init_dx / 32.0f) * 0.5f;
+
+				float final_colF = (final_dx / 32.0f + final_dy / 16.0f) * 0.5f;
+				float final_rowF = (final_dy / 16.0f - final_dx / 32.0f) * 0.5f;
+
+				int grid_init_col = int(floor(init_colF));
+				int grid_init_row = int(floor(init_rowF));
+
+				int grid_final_col = int(floor(final_colF));
+				int grid_final_row = int(floor(final_rowF));
+
+				cout << grid_init_col << " " << grid_init_row << endl;
+				cout << grid_final_col << " " << grid_final_row << endl;
+			}
 		}
 	}
 }

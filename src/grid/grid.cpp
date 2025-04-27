@@ -117,35 +117,27 @@ void Grid::assignTexture(Texture *srcTex) {
 }
 
 void Grid::getVertexData() {
-	float gridWidth =
-		(this->mapWidth + this->mapHeight) * (this->tileWidth / 2.0f);
-	float gridHeight =
-		(this->mapWidth + this->mapHeight) * (this->tileHeight / 2.0f);
-
-	float offsetX = (1024 / 2.0f) - ((mapWidth / 2.0f) * tileWidth / 2.0f);
-	float offsetY = (786 / 2.0f) - ((mapHeight / 2.0f) * tileHeight / 2.0f);
-
 	const float tex_tile_width = this->tileWidth / this->sprite->width;
 	const float tex_tile_height = this->tileHeight / this->sprite->height;
 
-	// std::cout << tex_tile_width << " " << tex_tile_height << std::endl;
-
 	for (int row = 0; row < this->mapHeight; row++) {
 		for (int col = 0; col < this->mapWidth; col++) {
-			float xCenter = ((col - row) * tileWidth / 2.0f) + offsetX;
-			float yCenter = ((col + row) * tileHeight / 2.0f) + offsetY;
+			float x = ((col - row) * tileWidth / 2.0f) +
+					  1024 / 2.0f; // Treating half of the screen as the offset
+								   // for width and 1/4th for height
+			float y = ((col + row) * tileHeight / 2.0f) - 768 / 7.0f;
 
-			float xTop = xCenter;
-			float yTop = yCenter - this->tileHeight / 2.0f;
+			float xTop = x;
+			float yTop = y;
 
-			float xRight = xCenter + this->tileWidth / 2.0f;
-			float yRight = yCenter;
+			float xRight = xTop + this->tileWidth / 2.0f;
+			float yRight = yTop + this->tileHeight / 2.0f;
 
-			float xBottom = xCenter;
-			float yBottom = yCenter + this->tileHeight / 2.0f;
+			float xBottom = xTop;
+			float yBottom = yTop + this->tileHeight;
 
-			float xLeft = xCenter - this->tileWidth / 2.0f;
-			float yLeft = yCenter;
+			float xLeft = xTop - this->tileWidth / 2.0f;
+			float yLeft = yTop + this->tileHeight / 2.0f;
 
 			float u_min, u_max;
 			float v_min, v_max;

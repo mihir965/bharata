@@ -10,13 +10,13 @@ unsigned int Unit::fragmentShader = 0;
 unsigned int Unit::shaderProgram = 0;
 std::vector<float> Unit::vertices = {
 	// pos      // tex (u, v)
-	0.0f, 1.0f, 0.0f,	1.0f, // top-left
-	1.0f, 1.0f, 0.047f, 1.0f, // top-right
-	1.0f, 0.0f, 0.047f, 0.0f, // bottom-right
+	0.0f, 1.0f, 0.0f,	 1.0f, // top-left
+	1.0f, 1.0f, 0.0147f, 1.0f, // top-right
+	1.0f, 0.0f, 0.0147f, 0.0f, // bottom-right
 
-	0.0f, 1.0f, 0.0f,	1.0f, // top-left
-	1.0f, 0.0f, 0.047f, 0.0f, // bottom-right
-	0.0f, 0.0f, 0.0f,	0.0f  // bottom-left
+	0.0f, 1.0f, 0.0f,	 1.0f, // top-left
+	1.0f, 0.0f, 0.0147f, 0.0f, // bottom-right
+	0.0f, 0.0f, 0.0f,	 0.0f  // bottom-left
 };
 
 Unit::Unit(int row, int col, Texture *sprite) {
@@ -77,17 +77,14 @@ void Unit::compileShaders(std::string *vSrc, std::string *fSrc) {
 
 void Unit::drawSprite() {
 	glUseProgram(Unit::shaderProgram);
-	float gridWidth = (16 + 16) * (64.0f / 2.0f);
-	float gridHeight = (16 + 16) * (32.0f / 2.0f);
-
-	float offsetX = (1024 - gridWidth) / 2.0f;
-	float offsetY = (786 - gridHeight) / 2.0f;
-	int isoX = (col - row) * (64.0f / 2) + offsetX;
-	int isoY = (col + row) * (32.0f / 2) + offsetY;
+	int isoX = (col - row) * (64.0f / 2);
+	int isoY = (col + row) * (32.0f / 2);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(isoX, isoY, 0.0f));
-	model = glm::scale(model, glm::vec3(128.0f * 2.0f, 64.0f * 2.0f, 1.0f));
+	model = glm::translate(
+		model, glm::vec3(isoX + (1024 / 2.0f) - 64.0f,
+						 isoY + (786 / 4.0f) - (12.25 * 32.0f), 0.0f));
+	model = glm::scale(model, glm::vec3(128.0f, 64.0f * 2.0f, 1.0f));
 
 	GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
 	glm::mat4 projection = glm::ortho(0.0f, 1024.0f, 786.0f, 0.0f, -1.0f, 1.0f);
@@ -105,4 +102,16 @@ void Unit::drawSprite() {
 	glBindVertexArray(Unit::VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+int Unit::getRow() {
+	return this->row;
+}
+
+int Unit::getCol() {
+	return this->col;
+}
+
+unsigned int Unit::getID() {
+	return this->unitId;
 }
