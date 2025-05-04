@@ -7,15 +7,12 @@
 
 int main() {
 	Game game;
-
 	bool gameInitialized =
 		game.init(32, 32, 50); // The arguements are the dimensions for the grid
-
 	if (gameInitialized) {
 		std::cout << "The game has been initialized" << std::endl;
 		game.runLoop();
 	}
-
 	game.clean();
 
 	return 0;

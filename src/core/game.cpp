@@ -86,6 +86,7 @@ bool Game::init(int mapH, int mapW, int num) {
 
 	// Loading unit textures
 	loadTexture("knightSprite", "./src/assets/knight.png");
+	loadTexture("selectedKnight", "./src/assets/knight_selected.png");
 	loadShader("unitVertex", "./src/shaders/unitVShader.vert");
 	loadShader("unitFragment", "./src/shaders/unitFShader.frag");
 	Unit::compileShaders(getShader("unitVertex"), getShader("unitFragment"));
@@ -110,25 +111,21 @@ bool Game::init(int mapH, int mapW, int num) {
 											 getTexture("knightSprite")));
 	}
 
-	// for (int i = 0; i < mapH; i++) {
-	//	for (int j = 0; j < mapW; j++) {
-	//		if (occupancyGrid[i][j] == 0) {
-	//			units.emplace_back(
-	//				make_unique<Unit>(i, j, getTexture("knightSprite")));
-	//		}
-	//	}
-	// }
-
 	// units.emplace_back(make_unique<Unit>(0, 0, getTexture("knightSprite")));
+
+	// Adding the selected knight to all the units
+	for (auto &unit : this->units) {
+		unit->setHighlightTexture(getTexture("selectedKnight"));
+	}
 	return true;
 }
 
 void Game::getUnits(int i_x, int i_y, int f_x, int f_y) {
-	for (int i = i_x; i <= f_x; i++) {
-		for (int j = i_y; j <= f_y; j++) {
-			for (auto &unit : this->units) {
-				if (unit->getRow() == i && unit->getCol() == j) {
-					this->selectedUnits.emplace_back(unit->getID());
+	for (int i = min(i_x, f_x); i <= max(i_x, f_x); i++) {
+		for (int j = min(i_y, f_y); j <= max(i_y, f_y); j++) {
+			for (auto &unit : units) {
+				if (unit->getCol() == i && unit->getRow() == j) {
+					unit->setSelected(true);
 				}
 			}
 		}
@@ -173,8 +170,22 @@ void Game::handleEvents() {
 				int grid_final_col = int(floor(final_colF));
 				int grid_final_row = int(floor(final_rowF));
 
-				cout << grid_init_col << " " << grid_init_row << endl;
-				cout << grid_final_col << " " << grid_final_row << endl;
+				cout << "This is the two coords" << endl;
+				cout << grid_init_row << " " << grid_init_col << endl;
+				cout << grid_final_row << " " << grid_final_col << endl;
+
+				cout << "Lets look at the cells that are getting selected"
+					 << endl;
+
+				for (int i = min(grid_init_col, grid_final_col);
+					 i <= max(grid_init_col, grid_final_col); i++) {
+					for (int j = min(grid_init_row, grid_final_row);
+						 j <= max(grid_init_row, grid_final_row); j++) {
+						cout << "The cell is : " << j << " " << i << endl;
+					}
+				}
+				getUnits(grid_init_col, grid_init_row, grid_final_col,
+						 grid_final_row);
 			}
 		}
 	}

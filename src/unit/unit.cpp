@@ -98,7 +98,12 @@ void Unit::drawSprite() {
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->texture->getID());
+	if (this->selected && this->highlightedTex) {
+		// std::cout << "Setting as selected" << std::endl;
+		glBindTexture(GL_TEXTURE_2D, this->highlightedTex->getID());
+	} else {
+		glBindTexture(GL_TEXTURE_2D, this->texture->getID());
+	}
 	glBindVertexArray(Unit::VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -114,4 +119,30 @@ int Unit::getCol() {
 
 unsigned int Unit::getID() {
 	return this->unitId;
+}
+
+void Unit::setTexture(Texture *sprite) {
+	this->texture = sprite;
+}
+
+void Unit::setHighlightTexture(Texture *sprite) {
+	this->highlightedTex = sprite;
+}
+
+// void Unit::setVertices(int unitType) {
+//
+// 	std::cout << "This ran" << std::endl;
+// 	this->vertices = {
+// 		0.0f, 1.0f, 0.70f,	 1.0f, // top-left
+// 		1.0f, 1.0f, 0.7147f, 1.0f, // top-right
+// 		1.0f, 0.0f, 0.7147f, 0.0f, // bottom-right
+//
+// 		0.0f, 1.0f, 0.70f,	 1.0f, // top-left
+// 		1.0f, 0.0f, 0.7147f, 0.0f, // bottom-right
+// 		0.0f, 0.0f, 0.70f,	 0.0f  // bottom-left
+// 	};
+// }
+
+void Unit::setSelected(bool s) {
+	this->selected = s;
 }

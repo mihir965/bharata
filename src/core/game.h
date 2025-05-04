@@ -49,7 +49,6 @@ class Game {
 	bool isSelecting;
 	int init_x, init_y;
 	int final_x, final_y;
-	std::vector<unsigned int> selectedUnits;
 };
 
 #endif

@@ -20,11 +20,17 @@ class Unit {
 	int getRow();
 	int getCol();
 	unsigned int getID();
+	void setTexture(Texture *sprite);
+	// void setVertices(int unitType);
+	void setSelected(bool s);
+	void setHighlightTexture(Texture *sprite);
 
   private:
 	int row, col;
 	Texture *texture;
 	unsigned int unitId;
+	bool selected = false;
+	Texture *highlightedTex = nullptr;
 	static std::vector<float> vertices;
 	static unsigned int nextID;
 	static unsigned int VAO;
