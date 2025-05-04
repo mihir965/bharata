@@ -23,14 +23,12 @@ class Unit {
 	void setTexture(Texture *sprite);
 	// void setVertices(int unitType);
 	void setSelected(bool s);
-	void setHighlightTexture(Texture *sprite);
 
   private:
 	int row, col;
 	Texture *texture;
 	unsigned int unitId;
 	bool selected = false;
-	Texture *highlightedTex = nullptr;
 	static std::vector<float> vertices;
 	static unsigned int nextID;
 	static unsigned int VAO;
@@ -38,5 +36,10 @@ class Unit {
 	static unsigned int vertexShader;
 	static unsigned int fragmentShader;
 	static unsigned int shaderProgram;
+	int frameIndex;
+	int atlasRows = 1;
+	int atlasCols = 68;
+	int selectedFrameIndex = 37;
+	int normalFrameIndex = 1;
 };
 #endif

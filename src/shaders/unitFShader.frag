@@ -3,7 +3,10 @@ in vec2 TexCoords;
 out vec4 color;
 
 uniform sampler2D image;
+uniform vec2 uvScale;
+uniform vec2 uvOffset;
 
 void main(){
-    color = texture(image, TexCoords);
+    vec2 uv = TexCoords * uvScale + uvOffset;
+    color = texture(image, uv);
 }

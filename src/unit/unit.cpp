@@ -10,13 +10,13 @@ unsigned int Unit::fragmentShader = 0;
 unsigned int Unit::shaderProgram = 0;
 std::vector<float> Unit::vertices = {
 	// pos      // tex (u, v)
-	0.0f, 1.0f, 0.0f,	 1.0f, // top-left
-	1.0f, 1.0f, 0.0147f, 1.0f, // top-right
-	1.0f, 0.0f, 0.0147f, 0.0f, // bottom-right
+	0.0f, 1.0f, 0.0f, 1.0f, // top-left
+	1.0f, 1.0f, 1.0f, 1.0f, // top-right
+	1.0f, 0.0f, 1.0f, 0.0f, // bottom-right
 
-	0.0f, 1.0f, 0.0f,	 1.0f, // top-left
-	1.0f, 0.0f, 0.0147f, 0.0f, // bottom-right
-	0.0f, 0.0f, 0.0f,	 0.0f  // bottom-left
+	0.0f, 1.0f, 0.0f, 1.0f, // top-left
+	1.0f, 0.0f, 1.0f, 0.0f, // bottom-right
+	0.0f, 0.0f, 0.0f, 0.0f	// bottom-left
 };
 
 Unit::Unit(int row, int col, Texture *sprite) {
@@ -30,15 +30,17 @@ void Unit::initGraphics() {
 
 	glGenVertexArrays(1, &Unit::VAO);
 	glGenBuffers(1, &Unit::VBO);
-
+	glBindVertexArray(Unit::VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, Unit::vertices.size() * sizeof(float),
 				 Unit::vertices.data(), GL_STATIC_DRAW);
-	glBindVertexArray(Unit::VAO);
-	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
 						  (void *)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+						  (void *)(2 * sizeof(float)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -97,13 +99,21 @@ void Unit::drawSprite() {
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+	int C = atlasCols, R = atlasRows;
+	int idx = selected ? selectedFrameIndex : normalFrameIndex;
+	float fx = idx % C;
+	float fy = float(idx) / C;
+
+	glm::vec2 uvScale = glm::vec2(1.0f / float(C), 1.0f / float(R));
+	glm::vec2 uvOffset = glm::vec2(fx * uvScale.x, (R - 1) * uvScale.y);
+
+	glUniform2fv(glGetUniformLocation(shaderProgram, "uvScale"), 1,
+				 &uvScale[0]);
+	glUniform2fv(glGetUniformLocation(shaderProgram, "uvOffset"), 1,
+				 &uvOffset[0]);
+
 	glActiveTexture(GL_TEXTURE0);
-	if (this->selected && this->highlightedTex) {
-		// std::cout << "Setting as selected" << std::endl;
-		glBindTexture(GL_TEXTURE_2D, this->highlightedTex->getID());
-	} else {
-		glBindTexture(GL_TEXTURE_2D, this->texture->getID());
-	}
+	glBindTexture(GL_TEXTURE_2D, this->texture->getID());
 	glBindVertexArray(Unit::VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -124,24 +134,6 @@ unsigned int Unit::getID() {
 void Unit::setTexture(Texture *sprite) {
 	this->texture = sprite;
 }
-
-void Unit::setHighlightTexture(Texture *sprite) {
-	this->highlightedTex = sprite;
-}
-
-// void Unit::setVertices(int unitType) {
-//
-// 	std::cout << "This ran" << std::endl;
-// 	this->vertices = {
-// 		0.0f, 1.0f, 0.70f,	 1.0f, // top-left
-// 		1.0f, 1.0f, 0.7147f, 1.0f, // top-right
-// 		1.0f, 0.0f, 0.7147f, 0.0f, // bottom-right
-//
-// 		0.0f, 1.0f, 0.70f,	 1.0f, // top-left
-// 		1.0f, 0.0f, 0.7147f, 0.0f, // bottom-right
-// 		0.0f, 0.0f, 0.70f,	 0.0f  // bottom-left
-// 	};
-// }
 
 void Unit::setSelected(bool s) {
 	this->selected = s;

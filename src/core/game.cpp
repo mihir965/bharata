@@ -86,7 +86,6 @@ bool Game::init(int mapH, int mapW, int num) {
 
 	// Loading unit textures
 	loadTexture("knightSprite", "./src/assets/knight.png");
-	loadTexture("selectedKnight", "./src/assets/knight_selected.png");
 	loadShader("unitVertex", "./src/shaders/unitVShader.vert");
 	loadShader("unitFragment", "./src/shaders/unitFShader.frag");
 	Unit::compileShaders(getShader("unitVertex"), getShader("unitFragment"));
@@ -111,12 +110,6 @@ bool Game::init(int mapH, int mapW, int num) {
 											 getTexture("knightSprite")));
 	}
 
-	// units.emplace_back(make_unique<Unit>(0, 0, getTexture("knightSprite")));
-
-	// Adding the selected knight to all the units
-	for (auto &unit : this->units) {
-		unit->setHighlightTexture(getTexture("selectedKnight"));
-	}
 	return true;
 }
 
