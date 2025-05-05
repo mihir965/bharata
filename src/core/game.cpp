@@ -7,7 +7,9 @@
 #include <fstream>
 #include <iterator>
 #include <memory>
+#include <queue>
 #include <random>
+#include <set>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -77,8 +79,7 @@ bool Game::init(int mapH, int mapW, int num) {
 	// Create units on the grid
 	// We need to update the occupancy grid with the way the actual grid is
 	// initialized
-	occupancyGrid =
-		std::vector<vector<unsigned int>>(mapH, vector<unsigned int>(mapW, 0));
+	occupancyGrid = std::vector<vector<int>>(mapH, vector<int>(mapW, 0));
 
 	for (int i = 0; i < mapH; i++) {
 		for (int j = 0; j < mapW; j++) {
@@ -199,11 +200,40 @@ void Game::handleEvents() {
 				// units to move
 				cout << "Adding movement to" << moveto_row << " " << moveto_col
 					 << endl;
+				std::vector<Unit *> movers;
 				for (auto &u : units) {
 					if (u->isSelected()) {
-						u->addMovement(this->grid->map,
-									   make_pair(moveto_row, moveto_col));
+						movers.push_back(u.get());
 					}
+				}
+				if (movers.empty())
+					return;
+				int N = movers.size();
+				std::vector<std::pair<int, int>> targets;
+
+				// BFS from r,c over the occupancyGrid
+				std::queue<pair<int, int>> q;
+				set<std::pair<int, int>> seen;
+				q.push({moveto_row, moveto_col});
+				seen.insert({moveto_row, moveto_col});
+				while (targets.size() < movers.size() && !q.empty()) {
+					auto [r, c] = q.front();
+					q.pop();
+					if (occupancyGrid[r][c] == 0)
+						targets.emplace_back(r, c);
+					for (auto [dr, dc] :
+						 {std::pair{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+						int nr = r + dr, nc = c + dc;
+						if (inBounds(nr, nc) && !seen.count({nr, nc})) {
+							seen.insert({nr, nc});
+							q.push({nr, nc});
+						}
+					}
+				}
+				for (size_t i = 0; i < movers.size() && i < targets.size();
+					 ++i) {
+					movers[i]->movementQueue = {};
+					movers[i]->addMovement(getOccupancy(), targets[i]);
 				}
 			}
 		}
@@ -271,4 +301,12 @@ std::string *Game::getShader(const std::string &name) {
 		return nullptr;
 	}
 	return ShaderMap.find(name)->second.get();
+}
+
+bool Game::inBounds(int row, int col) {
+	return (row <= this->grid->map.size() && col <= this->grid->map[0].size());
+}
+
+vector<vector<int>> Game::getOccupancy() {
+	return this->occupancyGrid;
 }

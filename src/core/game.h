@@ -38,6 +38,10 @@ class Game {
 
 	void getUnits(int i_x, int i_y, int f_x, int f_y);
 
+	bool inBounds(int row, int col);
+
+	vector<vector<int>> getOccupancy();
+
   private:
 	SDL_Window *window;
 	SDL_GLContext context;
@@ -47,7 +51,7 @@ class Game {
 	std::unordered_map<std::string, std::unique_ptr<std::string>> ShaderMap;
 	std::unique_ptr<Grid> grid;
 	std::vector<std::unique_ptr<Unit>> units;
-	std::vector<vector<unsigned int>> occupancyGrid;
+	std::vector<vector<int>> occupancyGrid;
 	bool isSelecting;
 	int init_x, init_y;
 
