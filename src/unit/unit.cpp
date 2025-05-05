@@ -1,5 +1,6 @@
 #include "unit.h"
 #include "texture/texture.h"
+#include <utility>
 #include <vector>
 
 unsigned int Unit::nextID = 0;
@@ -100,7 +101,8 @@ void Unit::drawSprite() {
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	int C = atlasCols, R = atlasRows;
-	int idx = selected ? selectedFrameIndex : normalFrameIndex;
+	// int idx = selected ? selectedFrameIndex : normalFrameIndex;
+	int idx = state;
 	float fx = idx % C;
 	float fy = float(idx) / C;
 
@@ -117,6 +119,8 @@ void Unit::drawSprite() {
 	glBindVertexArray(Unit::VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+	if (this->selected && this->state < this->selectedFrameIndex)
+		state++;
 }
 
 int Unit::getRow() {
@@ -137,4 +141,22 @@ void Unit::setTexture(Texture *sprite) {
 
 void Unit::setSelected(bool s) {
 	this->selected = s;
+}
+
+void Unit::moveTo(int targetRow, int targetCol) {
+	this->row = targetRow;
+	this->col = targetCol;
+}
+
+void Unit::addMovement(const std::vector<std::vector<int>> &grid,
+					   std::pair<int, int> target) {
+	std::vector<std::pair<int, int>> pathToFollow =
+		plan_path(grid, std::make_pair(this->row, this->col), target);
+	for (auto &road : pathToFollow) {
+		movementQueue.push(road);
+	}
+}
+
+bool Unit::isSelected() {
+	return this->selected;
 }

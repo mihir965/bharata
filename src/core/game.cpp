@@ -1,4 +1,5 @@
 #include "game.h"
+#include "ai/ai.h"
 #include "grid/grid.h"
 #include "texture/texture.h"
 #include <algorithm>
@@ -52,7 +53,7 @@ bool Game::init(int mapH, int mapW, int num) {
 	// The init function will also create the grid
 	//
 	// This is also assigning the sprite for the grid
-	//
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	grid = std::make_unique<Grid>(mapH, mapW);
@@ -60,7 +61,8 @@ bool Game::init(int mapH, int mapW, int num) {
 	cout << "Grid generation over" << endl;
 
 	// Loading textures
-	loadTexture("gridSprite", "./src/assets/grassland_tiles.png");
+	// loadTexture("gridSprite", "./src/assets/grassland_tiles.png");
+	loadTexture("gridSprite", "./src/assets/grass_and_water.png");
 	grid->assignTexture(this->getTexture("gridSprite"));
 	cout << "Returning game init" << endl;
 
@@ -179,6 +181,30 @@ void Game::handleEvents() {
 				}
 				getUnits(grid_init_col, grid_init_row, grid_final_col,
 						 grid_final_row);
+
+				isSelecting = false;
+			}
+			if (event.button.button == SDL_BUTTON_RIGHT) {
+				moveToX = event.button.x;
+				moveToY = event.button.y;
+				float movetox = float(moveToX) -
+								1024 / 2.0f; // This is how we are converting
+											 // screen cordinates to grid ones
+				float movetoy = float(moveToY) + 786 / 7.0f;
+
+				float moveto_col = (movetox / 32.0f + movetoy / 16.0f) * 0.5f;
+				float moveto_row = (movetoy / 16.0f - movetox / 32.0f) * 0.5f;
+
+				// Now that we have the coordinates around which we want the
+				// units to move
+				cout << "Adding movement to" << moveto_row << " " << moveto_col
+					 << endl;
+				for (auto &u : units) {
+					if (u->isSelected()) {
+						u->addMovement(this->grid->map,
+									   make_pair(moveto_row, moveto_col));
+					}
+				}
 			}
 		}
 	}
@@ -193,6 +219,11 @@ void Game::render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	grid->draw();
 	for (auto &unit : this->units) {
+		if (!unit->movementQueue.empty()) {
+			auto [nextR, nextC] = unit->movementQueue.front();
+			unit->movementQueue.pop();
+			unit->moveTo(nextR, nextC);
+		}
 		unit->drawSprite();
 	}
 	SDL_GL_SwapWindow(window);
@@ -202,6 +233,7 @@ void Game::runLoop() {
 	while (isRunning) {
 		handleEvents();
 		render();
+		SDL_Delay(50);
 	}
 }
 

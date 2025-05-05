@@ -107,9 +107,8 @@ std::vector<std::vector<int>> Grid::grid_init() {
 	return grid;
 }
 
-std::vector<std::vector<int>> Grid::generate() {
-	map = grid_init();
-	return map;
+void Grid::generate() {
+	this->map = grid_init();
 }
 
 void Grid::assignTexture(Texture *srcTex) {
@@ -150,14 +149,8 @@ void Grid::getVertexData() {
 				v_max = tex_tile_height;
 				break;
 			case 1:
-				u_min = 0.0f;
-				u_max = tex_tile_width;
-				v_min = 19 * tex_tile_height;
-				v_max = 20 * tex_tile_height;
-				break;
-			case 2:
-				u_min = 0.0f;
-				u_max = tex_tile_width;
+				u_min = tex_tile_width;
+				u_max = 2 * tex_tile_width;
 				v_min = 0.0f;
 				v_max = tex_tile_height;
 				break;

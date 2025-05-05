@@ -17,7 +17,9 @@ class Grid {
 	Grid(int h, int w);
 	~Grid();
 
-	std::vector<std::vector<int>> generate();
+	std::vector<std::vector<int>> map;
+
+	void generate();
 	std::vector<std::pair<int, int>>
 	blocked_cells(const std::vector<std::vector<int>> &grid);
 	std::vector<std::pair<int, int>>
@@ -44,7 +46,6 @@ class Grid {
 	std::string readFragmentShader();
 
   private:
-	std::vector<std::vector<int>> map;
 	int tileWidth = 64;
 	int tileHeight = 32;
 	int mapWidth;

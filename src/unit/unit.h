@@ -1,11 +1,13 @@
 #ifndef _UNIT_
 #define _UNIT_
 
+#include "../ai/ai.h"
 #include "../texture/texture.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <queue>
 #include <vector>
 
 class Unit {
@@ -21,14 +23,19 @@ class Unit {
 	int getCol();
 	unsigned int getID();
 	void setTexture(Texture *sprite);
-	// void setVertices(int unitType);
 	void setSelected(bool s);
+	int state = 1;
+	void addMovement(const std::vector<std::vector<int>> &grid,
+					 std::pair<int, int> target);
+	void clearMovementQueue();
+	bool isSelected();
+
+	std::queue<std::pair<int, int>> movementQueue;
 
   private:
 	int row, col;
 	Texture *texture;
 	unsigned int unitId;
-	bool selected = false;
 	static std::vector<float> vertices;
 	static unsigned int nextID;
 	static unsigned int VAO;
@@ -37,6 +44,7 @@ class Unit {
 	static unsigned int fragmentShader;
 	static unsigned int shaderProgram;
 	int frameIndex;
+	bool selected = false;
 	int atlasRows = 1;
 	int atlasCols = 68;
 	int selectedFrameIndex = 37;

@@ -7,9 +7,11 @@
 #include <glad/glad.h>
 #include <iostream>
 #include <memory>
+#include <queue>
 #include <string>
 #include <unit/unit.h>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -40,7 +42,7 @@ class Game {
 	SDL_Window *window;
 	SDL_GLContext context;
 	bool isRunning;
-
+	std::vector<std::unique_ptr<Unit>> selectedUnits;
 	std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap;
 	std::unordered_map<std::string, std::unique_ptr<std::string>> ShaderMap;
 	std::unique_ptr<Grid> grid;
@@ -48,7 +50,10 @@ class Game {
 	std::vector<vector<unsigned int>> occupancyGrid;
 	bool isSelecting;
 	int init_x, init_y;
+
 	int final_x, final_y;
+
+	int moveToX, moveToY;
 };
 
 #endif
