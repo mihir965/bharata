@@ -30,6 +30,10 @@ class Unit {
 	void clearMovementQueue();
 	bool isSelected();
 
+	void setScreenPosFromGrid();
+
+	void update(float dt);
+
 	std::queue<std::pair<int, int>> movementQueue;
 
   private:

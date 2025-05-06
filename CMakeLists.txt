@@ -1,44 +1,48 @@
 cmake_minimum_required(VERSION 3.10)
 project(Bharata VERSION 1.0)
 
-#Setting C++ standard
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-#Locate SDL2
-find_package(SDL2 REQUIRED)
-if(SDL2_FOUND)
-    include_directories(${SDL2_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "SDL2 not found")
-endif()
-
+# Include + Link manually for SDL2 and SDL2_image via Homebrew
 include_directories(
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/map
-    ${CMAKE_SOURCE_DIR}/src/glad
-    ${CMAKE_SOURCE_DIR}/src/shaders
-    ${CMAKE_SOURCE_DIR}/src/grid
-    ${CMAKE_SOURCE_DIR}/src/cell
-    ${CMAKE_SOURCE_DIR}/src/ai
-    ${CMAKE_SOURCE_DIR}/include/stb
     /opt/homebrew/include
+    /opt/homebrew/include/SDL2
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/glad
+    ${CMAKE_SOURCE_DIR}/src/core
+    ${CMAKE_SOURCE_DIR}/src/grid
+    ${CMAKE_SOURCE_DIR}/src/ai
+    ${CMAKE_SOURCE_DIR}/src/texture
+    ${CMAKE_SOURCE_DIR}/src/unit
 )
 
-#Locate OpenGL
+link_directories(/opt/homebrew/lib)
+
+# Find OpenGL
 find_package(OpenGL REQUIRED)
-if(OPENGL_FOUND)
-    include_directories(${OPENGL_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "OPENGL not found")
-endif()
 
-#Add GLAD
+# GLAD
 add_library(glad src/glad/glad.c)
-target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
-#Add your executable target with your source files
-add_executable(Bharata src/main/main.cpp src/main/stb.cpp src/map/map.cpp src/grid/grid.cpp src/ai/ai.cpp)
+# Executable
+add_executable(Bharata
+    src/main.cpp
+    src/core/game.cpp
+    src/grid/grid.cpp
+    src/ai/ai.cpp
+    src/texture/texture.cpp
+    src/unit/unit.cpp
+)
 
-target_link_libraries(Bharata PRIVATE glad ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES}) 
+# Link SDL2, SDL2_image, OpenGL, GLAD
+target_link_libraries(Bharata
+  PRIVATE
+    glad
+    SDL2
+    SDL2_image
+    ${OPENGL_LIBRARIES}
+)
