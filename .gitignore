@@ -18,5 +18,9 @@ Makefile
 *.dll
 *.out
 
+*.zip
+*.mov
+*.pdf
+
 # 🌐 CMake user config files
 CMakeUserPresets.json
